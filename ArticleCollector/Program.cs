@@ -11,7 +11,7 @@ namespace ArticleCollector
     {
         static void Main(string[] args)
         {
-            
+
         }
     }
 }
