@@ -61,12 +61,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ElasticsearchApi\Client.cs" />
     <Compile Include="Models\Article.cs" />
-    <Compile Include="Models\ElasticSearch\ConstantScore.cs" />
-    <Compile Include="Models\ElasticSearch\ExistsQuery.cs" />
-    <Compile Include="Models\ElasticSearch\Filter.cs" />
-    <Compile Include="Models\ElasticSearch\Query.cs" />
-    <Compile Include="Models\ElasticSearch\Term.cs" />
+    <Compile Include="Models\Elasticsearch\ConstantScore.cs" />
+    <Compile Include="Models\Elasticsearch\ExistsQuery.cs" />
+    <Compile Include="Models\Elasticsearch\Filter.cs" />
+    <Compile Include="Models\Elasticsearch\Query.cs" />
+    <Compile Include="Models\Elasticsearch\Term.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

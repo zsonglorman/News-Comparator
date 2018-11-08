@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ArticleCollector.Models.ElasticSearch
+namespace ArticleCollector.Models.Elasticsearch
 {
     /// <summary>
     /// Term query finds objects which contain the exact given value.

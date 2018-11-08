@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ArticleCollector.Models.ElasticSearch
+namespace ArticleCollector.Models.Elasticsearch
 {
     /// <summary>
     /// Defines filter context clause for Elasticsearch (used for filtering structured data).

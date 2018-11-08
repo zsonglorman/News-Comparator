@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace ArticleCollector.Models.ElasticSearch
+namespace ArticleCollector.Models.Elasticsearch
 {
     /// <summary>
     /// Represents an Elasticsearch query which checks whether an object already exists in the index.
