@@ -1,5 +1,8 @@
 ﻿using ArticleCollector.Models;
+using ArticleCollector.Models.Elasticsearch;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -43,7 +46,7 @@ namespace ArticleCollector.ElasticsearchApi
         /// <param name="article">the Article to send</param>
         public async Task AddArticleAsync(Article article)
         {
-            HttpResponseMessage response = await client.PostAsJsonAsync("/news/_doc?pretty", article);
+            var response = await client.PostAsJsonAsync("/news/_doc?pretty", article);
             if (response.StatusCode == System.Net.HttpStatusCode.Created)
             {
                 // article successfully added
@@ -55,6 +58,79 @@ namespace ArticleCollector.ElasticsearchApi
                 // TODO log error
                 throw new ApplicationException("Article couldn't be added to Elasticsearch: " + response.StatusCode.ToString());
             }
+        }
+
+        /// <summary>
+        /// Checks whether the given article already exists in Elasticsearch based on its address.
+        /// </summary>
+        /// <param name="article">the Article to check</param>
+        /// <returns>returns true if the given article exists</returns>
+        public async Task<bool> ArticleAlreadyExists(Article article)
+        {
+            // generate Elasticsearch exists query with the article's address
+            var elasticExistsQuery = GetElasticExistsQuery(article);
+
+            // send the query to Elasticsearch API
+            var response = await client.PostAsJsonAsync("/news/_search?pretty", elasticExistsQuery);
+
+            // read the string content of the response
+            string responseContent = await response.Content.ReadAsStringAsync();
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                // Elasticsearch query was successful, let's get results count from response
+                dynamic queryResult = JsonConvert.DeserializeObject<dynamic>(responseContent);
+                int? resultsCount = queryResult?.hits?.total;
+                // if query result has no hits or total attribute, result will be null
+
+                if (!resultsCount.HasValue)
+                {
+                    // couldn't get results count from response JSON
+                    // TODO log error
+                    throw new ApplicationException("Couldn't get results count of Elasticsearch exists query: unexpected response JSON!");
+                }
+
+                // return whether there are any results found (0 result: false, 0< results: true)
+                return resultsCount.Value > 0;
+            }
+            else
+            {
+                // Elasticsearch query was unsuccessful
+                // TODO log error
+                throw new ApplicationException("Elasticsearch exists query was unsuccessful: " + response.StatusCode.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Generates exists query for Elasticsearch for the given article.
+        /// </summary>
+        /// <param name="article">query will be generated for this Article</param>
+        /// <returns>exists query for Elasticsearch</returns>
+        private ExistsQuery GetElasticExistsQuery(Article article)
+        {
+            var elasticExistsQuery = new ExistsQuery()
+            {
+                Query = new Query()
+                {
+                    ConstantScore = new ConstantScore()
+                    {
+                        Filter = new Filter()
+                        {
+                            Term = new Term()
+                            {
+                                AddressKeyword = article.Address
+                            }
+                        }
+                    }
+                },
+                Source = new List<string>()
+                {
+                    "Title",
+                    "Address"
+                }
+            };
+
+            return elasticExistsQuery;
         }
     }
 }
