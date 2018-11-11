@@ -25,6 +25,9 @@
         /// </summary>
         public string Text { get; set; }
 
+        /// <summary>
+        /// Initializes a news article with the given parameters.
+        /// </summary>
         public Article(string address, string title, string lead)
         {
             Address = address;

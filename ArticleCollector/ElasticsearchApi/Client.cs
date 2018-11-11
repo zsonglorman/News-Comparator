@@ -24,6 +24,10 @@ namespace ArticleCollector.ElasticsearchApi
         /// </summary>
         private HttpClient client;
 
+        /// <summary>
+        /// Initializes the client with the given Elasticsearch API base address.
+        /// </summary>
+        /// <param name="baseAddress">the base address of Elasticsearch API</param>
         public Client(Uri baseAddress)
         {
             BaseAddress = baseAddress;
