@@ -1,4 +1,5 @@
-﻿using ArticleCollector.Models;
+﻿using ElasticsearchClient;
+using ElasticsearchClient.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace ArticleCollector
             List<Article> articles = articleCollectorBrowser.GetArticlesFromNewsPortals();
 
             // initialize Elasticsearch API client (TODO read URI from config)
-            var client = new ElasticsearchApi.Client(new Uri("http://localhost:9200/"));
+            var client = new ArticleClient(new Uri("http://localhost:9200/"));
 
             foreach (var article in articles)
             {

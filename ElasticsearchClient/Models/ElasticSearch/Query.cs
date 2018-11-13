@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ArticleCollector.Models.Elasticsearch
+namespace ElasticsearchClient.Models.Elasticsearch
 {
     /// <summary>
     /// The query which will be sent to Elasticsearch API.

@@ -1,4 +1,4 @@
-﻿using ArticleCollector.Models;
+﻿using ElasticsearchClient.Models;
 using HtmlAgilityPack;
 using ScrapySharp.Extensions;
 using ScrapySharp.Network;

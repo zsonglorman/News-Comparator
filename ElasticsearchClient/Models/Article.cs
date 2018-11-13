@@ -1,9 +1,9 @@
-﻿namespace ArticleCollector.Models
+﻿namespace ElasticsearchClient.Models
 {
     /// <summary>
     /// Represents a simple news article of an online newspaper.
     /// </summary>
-    class Article
+    public class Article
     {
         /// <summary>
         /// The URL of the news article.

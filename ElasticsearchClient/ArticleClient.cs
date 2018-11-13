@@ -1,5 +1,5 @@
-﻿using ArticleCollector.Models;
-using ArticleCollector.Models.Elasticsearch;
+﻿using ElasticsearchClient.Models;
+using ElasticsearchClient.Models.Elasticsearch;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -7,12 +7,12 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace ArticleCollector.ElasticsearchApi
+namespace ElasticsearchClient
 {
     /// <summary>
     /// Represents a client used for Elasticsearch API.
     /// </summary>
-    class Client
+    public class ArticleClient
     {
         /// <summary>
         /// The base address of Elasticsearch API.
@@ -28,7 +28,7 @@ namespace ArticleCollector.ElasticsearchApi
         /// Initializes the client with the given Elasticsearch API base address.
         /// </summary>
         /// <param name="baseAddress">the base address of Elasticsearch API</param>
-        public Client(Uri baseAddress)
+        public ArticleClient(Uri baseAddress)
         {
             BaseAddress = baseAddress;
 
