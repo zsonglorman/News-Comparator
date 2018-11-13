@@ -47,7 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArticleClient.cs" />
+    <Compile Include="ElasticsearchArticleClient.cs" />
+    <Compile Include="IArticleClient.cs" />
     <Compile Include="Models\Article.cs" />
     <Compile Include="Models\ElasticSearch\ConstantScore.cs" />
     <Compile Include="Models\ElasticSearch\ExistsQuery.cs" />

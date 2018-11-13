@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using ElasticsearchClient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace RelatedArticlesService
 {
@@ -23,6 +19,10 @@ namespace RelatedArticlesService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // use dependency injection to inject elasticsearch article client with given base address
+            // TODO read uri from config
+            services.AddSingleton<IArticleClient>(new ElasticsearchArticleClient(new Uri("http://localhost:9200/")));
+
             services.AddMvc();
         }
 

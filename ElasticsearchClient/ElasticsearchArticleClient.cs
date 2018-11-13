@@ -12,7 +12,7 @@ namespace ElasticsearchClient
     /// <summary>
     /// Represents a client used for Elasticsearch API.
     /// </summary>
-    public class ArticleClient
+    public class ElasticsearchArticleClient : IArticleClient
     {
         /// <summary>
         /// The base address of Elasticsearch API.
@@ -28,7 +28,7 @@ namespace ElasticsearchClient
         /// Initializes the client with the given Elasticsearch API base address.
         /// </summary>
         /// <param name="baseAddress">the base address of Elasticsearch API</param>
-        public ArticleClient(Uri baseAddress)
+        public ElasticsearchArticleClient(Uri baseAddress)
         {
             BaseAddress = baseAddress;
 
