@@ -26,7 +26,7 @@ namespace ArticleCollector
             foreach (var article in articles)
             {
                 // check whether article already exists in Elasticsearch
-                bool articleAlreadyExists = await client.ArticleAlreadyExists(article);
+                bool articleAlreadyExists = await client.ArticleAlreadyExists(article.Address);
 
                 if (!articleAlreadyExists)
                 {

@@ -65,14 +65,14 @@ namespace ElasticsearchClient
         }
 
         /// <summary>
-        /// Checks whether the given article already exists in Elasticsearch based on its address.
+        /// Checks whether article already exists in Elasticsearch based on its address.
         /// </summary>
-        /// <param name="article">the Article to check</param>
+        /// <param name="articleAddress">the article address to check</param>
         /// <returns>returns true if the given article exists</returns>
-        public async Task<bool> ArticleAlreadyExists(Article article)
+        public async Task<bool> ArticleAlreadyExists(string articleAddress)
         {
             // generate Elasticsearch exists query with the article's address
-            var elasticExistsQuery = GetElasticExistsQuery(article);
+            var elasticExistsQuery = GetElasticExistsQuery(articleAddress);
 
             // send the query to Elasticsearch API
             var response = await client.PostAsJsonAsync("/news/_search?pretty", elasticExistsQuery);
@@ -106,11 +106,11 @@ namespace ElasticsearchClient
         }
 
         /// <summary>
-        /// Generates exists query for Elasticsearch for the given article.
+        /// Generates exists query for Elasticsearch for the given article address.
         /// </summary>
-        /// <param name="article">query will be generated for this Article</param>
+        /// <param name="articleAddress">query will be generated for this article address</param>
         /// <returns>exists query for Elasticsearch</returns>
-        private ExistsQuery GetElasticExistsQuery(Article article)
+        private ExistsQuery GetElasticExistsQuery(string articleAddress)
         {
             var elasticExistsQuery = new ExistsQuery()
             {
@@ -122,7 +122,7 @@ namespace ElasticsearchClient
                         {
                             Term = new Term()
                             {
-                                AddressKeyword = article.Address
+                                AddressKeyword = articleAddress
                             }
                         }
                     }
