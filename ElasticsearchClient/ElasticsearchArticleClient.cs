@@ -65,11 +65,11 @@ namespace ElasticsearchClient
         }
 
         /// <summary>
-        /// Checks whether article already exists in Elasticsearch based on its address.
+        /// Returns article ID based on its address, if the article already exists in Elasticsearch.
         /// </summary>
         /// <param name="articleAddress">the article address to check</param>
-        /// <returns>returns true if the given article exists</returns>
-        public async Task<bool> ArticleAlreadyExists(string articleAddress)
+        /// <returns>returns true if the given article exists together with its id</returns>
+        public async Task<ArticleExistsData> TryGetArticleId(string articleAddress)
         {
             // generate Elasticsearch exists query with the article's address
             var elasticExistsQuery = GetElasticExistsQuery(articleAddress);
@@ -94,8 +94,17 @@ namespace ElasticsearchClient
                     throw new ApplicationException("Couldn't get results count of Elasticsearch exists query: unexpected response JSON!");
                 }
 
-                // return whether there are any results found (0 result: false, 0< results: true)
-                return resultsCount.Value > 0;
+                // check whether there are any results found (0 result: false, 0< results: true)
+                bool articleExists = resultsCount.Value > 0;
+                
+                string articleId = "";
+                if (articleExists)
+                {
+                    // if there is a result, get its id, and include it in the return data 
+                    articleId = queryResult?.hits?.hits?[0]._id;
+                }
+
+                return new ArticleExistsData(articleExists, articleId);
             }
             else
             {

@@ -7,6 +7,6 @@ namespace ElasticsearchClient
     {
         Task AddArticleAsync(Article article);
 
-        Task<bool> ArticleAlreadyExists(string articleAddress);
+        Task<ArticleExistsData> TryGetArticleId(string articleAddress);
     }
 }

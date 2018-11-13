@@ -16,7 +16,7 @@ namespace RelatedArticlesService.Controllers
 
         public ArticleController(IArticleClient client)
         {
-            elasticsearchClient = client; 
+            elasticsearchClient = client;
         }
 
         public async Task<IActionResult> Get([FromQuery] string address)
@@ -27,13 +27,17 @@ namespace RelatedArticlesService.Controllers
             }
 
             // check whether article already exists in Elasticsearch
-            bool articleAlreadyExists = await elasticsearchClient.ArticleAlreadyExists(address);
+            var articleAlreadyExistsData = await elasticsearchClient.TryGetArticleId(address);
+            bool articleAlreadyExists = articleAlreadyExistsData.ArticleExists;
 
             if (!articleAlreadyExists)
             {
                 // article doesn't exist yet in Elasticsearch, so return 404 Not Found
                 return NotFound("Article doesn't exist in Elasticsearch yet.");
             }
+
+            // article already exists, get its ID from client response
+            string articleId = articleAlreadyExistsData.ArticleId;
 
             // TODO
             return Ok(address);

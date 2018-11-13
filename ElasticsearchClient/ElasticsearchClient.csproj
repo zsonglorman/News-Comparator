@@ -50,6 +50,7 @@
     <Compile Include="ElasticsearchArticleClient.cs" />
     <Compile Include="IArticleClient.cs" />
     <Compile Include="Models\Article.cs" />
+    <Compile Include="Models\ArticleExistsData.cs" />
     <Compile Include="Models\ElasticSearch\ConstantScore.cs" />
     <Compile Include="Models\ElasticSearch\ExistsQuery.cs" />
     <Compile Include="Models\ElasticSearch\Filter.cs" />
