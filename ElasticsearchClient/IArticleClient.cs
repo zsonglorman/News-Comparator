@@ -8,5 +8,7 @@ namespace ElasticsearchClient
         Task AddArticleAsync(Article article);
 
         Task<ArticleExistsData> TryGetArticleId(string articleAddress);
+
+        Task<RelatedArticleData> TryGetRelatedArticleAddress(string articleId);
     }
 }

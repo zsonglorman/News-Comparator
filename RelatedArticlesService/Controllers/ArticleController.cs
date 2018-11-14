@@ -39,8 +39,15 @@ namespace RelatedArticlesService.Controllers
             // article already exists, get its ID from client response
             string articleId = articleAlreadyExistsData.ArticleId;
 
-            // TODO
-            return Ok(address);
+            var relatedArticleData = await elasticsearchClient.TryGetRelatedArticleAddress(articleId);
+            if (!relatedArticleData.RelatedArticleExists)
+            {
+                // there is no related article, let's return 404 Not Found
+                return NotFound("There is no related article in Elasticsearch.");
+            }
+
+            // related article found, return its address
+            return Ok(relatedArticleData.RelatedArticleAddress);
         }
     }
 }

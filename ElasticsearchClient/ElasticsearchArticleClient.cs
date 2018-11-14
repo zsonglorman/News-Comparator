@@ -1,5 +1,7 @@
 ﻿using ElasticsearchClient.Models;
 using ElasticsearchClient.Models.Elasticsearch;
+using ElasticsearchClient.Models.ElasticSearch.MoreLikeThis;
+using ElasticsearchClient.Models.ElasticSearch.Result;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -68,7 +70,7 @@ namespace ElasticsearchClient
         /// Returns article ID based on its address, if the article already exists in Elasticsearch.
         /// </summary>
         /// <param name="articleAddress">the article address to check</param>
-        /// <returns>returns true if the given article exists together with its id</returns>
+        /// <returns>returns true if the given article exists together with its ID</returns>
         public async Task<ArticleExistsData> TryGetArticleId(string articleAddress)
         {
             // generate Elasticsearch exists query with the article's address
@@ -82,12 +84,11 @@ namespace ElasticsearchClient
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                // Elasticsearch query was successful, let's get results count from response
-                dynamic queryResult = JsonConvert.DeserializeObject<dynamic>(responseContent);
-                int? resultsCount = queryResult?.hits?.total;
-                // if query result has no hits or total attribute, result will be null
+                // Elasticsearch query was successful
+                var existsQueryResult = JsonConvert.DeserializeObject<QueryResult>(responseContent);
 
-                if (!resultsCount.HasValue)
+                if (existsQueryResult == null || existsQueryResult.Hits == null
+                    || existsQueryResult.Hits.HitList == null)
                 {
                     // couldn't get results count from response JSON
                     // TODO log error
@@ -95,13 +96,13 @@ namespace ElasticsearchClient
                 }
 
                 // check whether there are any results found (0 result: false, 0< results: true)
-                bool articleExists = resultsCount.Value > 0;
+                bool articleExists = existsQueryResult.Hits.Total > 0;
                 
                 string articleId = "";
                 if (articleExists)
                 {
-                    // if there is a result, get its id, and include it in the return data 
-                    articleId = queryResult?.hits?.hits?[0]._id;
+                    // if there is a result, get its id, and include it in the return data
+                    articleId = existsQueryResult.Hits.HitList[0].Id;
                 }
 
                 return new ArticleExistsData(articleExists, articleId);
@@ -115,15 +116,15 @@ namespace ElasticsearchClient
         }
 
         /// <summary>
-        /// Generates exists query for Elasticsearch for the given article address.
+        /// Generates Exists query for Elasticsearch for the given article address.
         /// </summary>
         /// <param name="articleAddress">query will be generated for this article address</param>
-        /// <returns>exists query for Elasticsearch</returns>
+        /// <returns>Exists query for Elasticsearch</returns>
         private ExistsQuery GetElasticExistsQuery(string articleAddress)
         {
             var elasticExistsQuery = new ExistsQuery()
             {
-                Query = new Query()
+                Query = new Models.Elasticsearch.Query()
                 {
                     ConstantScore = new ConstantScore()
                     {
@@ -144,6 +145,85 @@ namespace ElasticsearchClient
             };
 
             return elasticExistsQuery;
+        }
+
+        /// <summary>
+        /// Returns the address of a related article to the given article ID from Elasticsearch.
+        /// </summary>
+        /// <param name="articleId">the article ID to search for related article</param>
+        /// <returns>returns true if the related article exists together with its address</returns>
+        public async Task<RelatedArticleData> TryGetRelatedArticleAddress(string articleId)
+        {
+            // generate Elasticsearch more like this query with the article's id
+            var elasticMoreLikeThisQuery = GetElasticMoreLikeThisQuery(articleId);
+
+            // send the query to Elasticsearch API
+            var response = await client.PostAsJsonAsync("/news/_search?pretty", elasticMoreLikeThisQuery);
+
+            // read the string content of the response
+            string responseContent = await response.Content.ReadAsStringAsync();
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var moreLikeThisResult = JsonConvert.DeserializeObject<QueryResult>(responseContent);
+
+                if (moreLikeThisResult == null || moreLikeThisResult.Hits == null
+                    || moreLikeThisResult.Hits.HitList == null)
+                {
+                    throw new ApplicationException("Couldn't get result of Elasticsearch more like this query: unexpected response JSON!");
+                }
+
+                string relatedArticleAddress = "";
+                if (moreLikeThisResult.Hits.Total == 0
+                    || moreLikeThisResult.Hits.HitList.Count == 0)
+                {
+                    // there is no related article
+                    return new RelatedArticleData(false, relatedArticleAddress);
+                }
+
+                var mostRelatedArticleResult = moreLikeThisResult.Hits.HitList[0];
+                if (mostRelatedArticleResult.Score < 10)
+                {
+                    // based on the result score, there is no related article
+                    return new RelatedArticleData(false, relatedArticleAddress);
+                }
+
+                relatedArticleAddress = mostRelatedArticleResult.Article.Address;
+                return new RelatedArticleData(true, relatedArticleAddress);
+            }
+            else
+            {
+                // Elasticsearch query was unsuccessful
+                // TODO log error
+                throw new ApplicationException("Elasticsearch exists query was unsuccessful: " + response.StatusCode.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Generates More Like This query for Elasticsearch for the given article ID.
+        /// </summary>
+        /// <param name="articleId">query will be generated for this article ID</param>
+        /// <returns>More Like This query for Elasticsearch</returns>
+        private MoreLikeThisQuery GetElasticMoreLikeThisQuery(string articleId)
+        {
+            var elasticMoreLikeThisQuery = new MoreLikeThisQuery()
+            {
+                Query = new Models.ElasticSearch.MoreLikeThis.Query()
+                {
+                    MoreLikeThis = new MoreLikeThis()
+                    {
+                        Like = new Like()
+                        {
+                            Index = "news",
+                            Type = "_doc",
+                            Id = articleId
+                        },
+                        MinimumDocumentFrequence = 1
+                    }
+                }
+            };
+
+            return elasticMoreLikeThisQuery;
         }
     }
 }

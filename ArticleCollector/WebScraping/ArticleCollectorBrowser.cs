@@ -132,11 +132,21 @@ namespace ArticleCollector.WebScraping
 
                 HtmlNode articleText = articlePage.Html.CssSelect(".cikk-torzs").First();
 
+                // get donation node ("nincs masik" widget)
+                var donateNode = articleText.Descendants().Where(d => d.GetAttributeValue("class", "").Contains("nm_widget")).FirstOrDefault();
+
                 foreach (var p in articleText.Descendants())
                 {
                     if (p.OriginalName == "p" || p.OriginalName.StartsWith("h") || p.OriginalName == "li")
                     {
                         // paragraphs, headings and lists
+
+                        if (donateNode != null && donateNode.Descendants().Contains(p))
+                        {
+                            // this is not part of the article, but a campaign to donate money for the news portal
+                            continue;
+                        }
+
                         articleTextBuilder.AppendLine(p.InnerText.Trim());
                     }
                 }
