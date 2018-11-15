@@ -40,6 +40,7 @@ namespace ArticleCollector.WebScraping
         /// </summary>
         public ArticleCollectorBrowser()
         {
+            // initialize internal web scraping browser
             scrapingBrowser = new ScrapingBrowser()
             {
                 Encoding = Encoding.UTF8
@@ -109,7 +110,7 @@ namespace ArticleCollector.WebScraping
                 articles.Add(article);
             }
 
-            // navigate to the collected articles' main pages
+            // navigate to the collected articles' main pages to retrieve full text of article
             foreach (var article in articles)
             {
                 var articlePage = scrapingBrowser.NavigateToPage(new Uri(article.Address));
@@ -184,7 +185,7 @@ namespace ArticleCollector.WebScraping
                 articles.Add(article);
             }
 
-            // navigate to the collected articles' main pages
+            // navigate to the collected articles' main pages to retrieve full text of article
             foreach (var article in articles)
             {
                 var articlePage = scrapingBrowser.NavigateToPage(new Uri(article.Address));
@@ -227,7 +228,7 @@ namespace ArticleCollector.WebScraping
 
                 if (address.Contains("/galeria/"))
                 {
-                    // no article, just gallery, skip it
+                    // this is jut a gallery, not an article, so we skip it
                     continue;
                 }
 
@@ -238,6 +239,7 @@ namespace ArticleCollector.WebScraping
                 articles.Add(article);
             }
 
+            // navigate to the collected articles' main pages to retrieve full text of article
             foreach (var article in articles)
             {
                 var articlePage = scrapingBrowser.NavigateToPage(new Uri(article.Address));

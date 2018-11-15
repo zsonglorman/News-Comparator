@@ -14,6 +14,10 @@ namespace ArticleCollector
             MainAsync().GetAwaiter().GetResult();
         }
 
+        /// <summary>
+        /// Main async entry point method
+        /// </summary>
+        /// <returns></returns>
         static async Task MainAsync()
         {
             // initialize article collector web scraping browser, and get articles from news portals

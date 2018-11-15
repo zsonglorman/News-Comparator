@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace ElasticsearchClient
 {
     /// <summary>
-    /// Represents a client used for Elasticsearch API.
+    /// Represents a client used for managing articles via Elasticsearch API.
     /// </summary>
     public class ElasticsearchArticleClient : IArticleClient
     {
@@ -67,7 +67,7 @@ namespace ElasticsearchClient
         }
 
         /// <summary>
-        /// Returns article ID based on its address, if the article already exists in Elasticsearch.
+        /// Retrieves article ID based on its address, if the article already exists in Elasticsearch.
         /// </summary>
         /// <param name="articleAddress">the article address to check</param>
         /// <returns>returns true if the given article exists together with its ID</returns>
@@ -84,15 +84,13 @@ namespace ElasticsearchClient
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                // Elasticsearch query was successful
+                // Elasticsearch query was successful, deserialize result
                 var existsQueryResult = JsonConvert.DeserializeObject<QueryResult>(responseContent);
 
                 if (existsQueryResult == null || existsQueryResult.Hits == null
                     || existsQueryResult.Hits.HitList == null)
                 {
-                    // couldn't get results count from response JSON
-                    // TODO log error
-                    throw new ApplicationException("Couldn't get results count of Elasticsearch exists query: unexpected response JSON!");
+                    throw new ApplicationException("Couldn't get result of Elasticsearch exists query: unexpected response JSON!");
                 }
 
                 // check whether there are any results found (0 result: false, 0< results: true)
@@ -148,7 +146,7 @@ namespace ElasticsearchClient
         }
 
         /// <summary>
-        /// Returns the address of a related article to the given article ID from Elasticsearch.
+        /// Retrieves the address of a related article to the given article ID from Elasticsearch.
         /// </summary>
         /// <param name="articleId">the article ID to search for related article</param>
         /// <returns>returns true if the related article exists together with its address</returns>
@@ -165,6 +163,7 @@ namespace ElasticsearchClient
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
+                // Elasticsearch query was successful, deserialize result
                 var moreLikeThisResult = JsonConvert.DeserializeObject<QueryResult>(responseContent);
 
                 if (moreLikeThisResult == null || moreLikeThisResult.Hits == null
@@ -177,10 +176,11 @@ namespace ElasticsearchClient
                 if (moreLikeThisResult.Hits.Total == 0
                     || moreLikeThisResult.Hits.HitList.Count == 0)
                 {
-                    // there is no related article
+                    // there is no related article at all
                     return new RelatedArticleData(false, relatedArticleAddress);
                 }
 
+                // get most related article
                 var mostRelatedArticleResult = moreLikeThisResult.Hits.HitList[0];
                 if (mostRelatedArticleResult.Score < 10)
                 {
@@ -188,6 +188,7 @@ namespace ElasticsearchClient
                     return new RelatedArticleData(false, relatedArticleAddress);
                 }
 
+                // return the most related article's address
                 relatedArticleAddress = mostRelatedArticleResult.Article.Address;
                 return new RelatedArticleData(true, relatedArticleAddress);
             }
@@ -195,7 +196,7 @@ namespace ElasticsearchClient
             {
                 // Elasticsearch query was unsuccessful
                 // TODO log error
-                throw new ApplicationException("Elasticsearch exists query was unsuccessful: " + response.StatusCode.ToString());
+                throw new ApplicationException("Elasticsearch more like this query was unsuccessful: " + response.StatusCode.ToString());
             }
         }
 

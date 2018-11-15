@@ -1,26 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ElasticsearchClient;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace RelatedArticlesService.Controllers
-{
-    // specify route to API controller
-    [Route("api/[controller]")]
+{   
+    /// <summary>
+    /// The main web API controller for news articles.
+    /// </summary>
+    [Route("api/[controller]")] // specify route to API controller
     public class ArticleController : Controller
     {
+        /// <summary>
+        /// The Elasticsearch client used internally for finding related articles.
+        /// </summary>
         private readonly IArticleClient elasticsearchClient;
 
+        /// <summary>
+        /// Initializes a new controller with the given IArticleClient.
+        /// </summary>
         public ArticleController(IArticleClient client)
         {
+            // use dependency injection to set the client
             elasticsearchClient = client;
         }
 
+        /// <summary>
+        /// Retrieves a related article (if any) for the given article address.
+        /// </summary>
+        /// <param name="address">the address to find related articles to, retrieved from URL query string</param>
+        /// <returns>the address of the found related article (if any)</returns>
         public async Task<IActionResult> Get([FromQuery] string address)
         {
+            // validate the address retrieved from URL query string
             if (string.IsNullOrWhiteSpace(address))
             {
                 return BadRequest("Article address must not be empty.");
@@ -28,25 +39,25 @@ namespace RelatedArticlesService.Controllers
 
             // check whether article already exists in Elasticsearch
             var articleAlreadyExistsData = await elasticsearchClient.TryGetArticleId(address);
-            bool articleAlreadyExists = articleAlreadyExistsData.ArticleExists;
 
-            if (!articleAlreadyExists)
+            if (!articleAlreadyExistsData.ArticleExists)
             {
-                // article doesn't exist yet in Elasticsearch, so return 404 Not Found
+                // article doesn't exist in Elasticsearch yet, so return 404 Not Found
                 return NotFound("Article doesn't exist in Elasticsearch yet.");
             }
 
             // article already exists, get its ID from client response
             string articleId = articleAlreadyExistsData.ArticleId;
 
+            // get related article from Elasticsearch
             var relatedArticleData = await elasticsearchClient.TryGetRelatedArticleAddress(articleId);
             if (!relatedArticleData.RelatedArticleExists)
             {
-                // there is no related article, let's return 404 Not Found
+                // there is no related article found, so return 404 Not Found
                 return NotFound("There is no related article in Elasticsearch.");
             }
 
-            // related article found, return its address
+            // related article successfully found, return its address
             return Ok(relatedArticleData.RelatedArticleAddress);
         }
     }
