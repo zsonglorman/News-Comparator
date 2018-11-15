@@ -1,5 +1,5 @@
 ﻿using ElasticsearchClient.Models;
-using ElasticsearchClient.Models.Elasticsearch;
+using ElasticsearchClient.Models.Elasticsearch.Existence;
 using ElasticsearchClient.Models.ElasticSearch.MoreLikeThis;
 using ElasticsearchClient.Models.ElasticSearch.Result;
 using Newtonsoft.Json;
@@ -123,7 +123,7 @@ namespace ElasticsearchClient
         {
             var elasticExistsQuery = new ExistsQuery()
             {
-                Query = new Models.Elasticsearch.Query()
+                Query = new Models.Elasticsearch.Existence.Query()
                 {
                     ConstantScore = new ConstantScore()
                     {

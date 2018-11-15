@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ElasticsearchClient.Models.Elasticsearch
+namespace ElasticsearchClient.Models.Elasticsearch.Existence
 {
     /// <summary>
     /// Constant score tells Elasticsearch that scoring of results should be disabled.

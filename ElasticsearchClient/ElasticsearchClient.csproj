@@ -51,19 +51,19 @@
     <Compile Include="IArticleClient.cs" />
     <Compile Include="Models\Article.cs" />
     <Compile Include="Models\ArticleExistsData.cs" />
-    <Compile Include="Models\ElasticSearch\ConstantScore.cs" />
-    <Compile Include="Models\ElasticSearch\ExistsQuery.cs" />
-    <Compile Include="Models\ElasticSearch\Filter.cs" />
+    <Compile Include="Models\ElasticSearch\Existence\ConstantScore.cs" />
+    <Compile Include="Models\ElasticSearch\Existence\ExistsQuery.cs" />
+    <Compile Include="Models\ElasticSearch\Existence\Filter.cs" />
     <Compile Include="Models\ElasticSearch\MoreLikeThis\Like.cs" />
     <Compile Include="Models\ElasticSearch\MoreLikeThis\MoreLikeThis.cs" />
     <Compile Include="Models\ElasticSearch\MoreLikeThis\MoreLikeThisQuery.cs" />
     <Compile Include="Models\ElasticSearch\MoreLikeThis\Query.cs" />
-    <Compile Include="Models\ElasticSearch\Query.cs" />
+    <Compile Include="Models\ElasticSearch\Existence\Query.cs" />
     <Compile Include="Models\ElasticSearch\Result\Hit.cs" />
     <Compile Include="Models\ElasticSearch\Result\Hits.cs" />
     <Compile Include="Models\ElasticSearch\Result\QueryResult.cs" />
     <Compile Include="Models\ElasticSearch\Result\Shards.cs" />
-    <Compile Include="Models\ElasticSearch\Term.cs" />
+    <Compile Include="Models\ElasticSearch\Existence\Term.cs" />
     <Compile Include="Models\RelatedArticleData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

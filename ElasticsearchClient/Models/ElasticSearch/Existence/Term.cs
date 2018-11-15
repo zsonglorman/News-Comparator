@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ElasticsearchClient.Models.Elasticsearch
+namespace ElasticsearchClient.Models.Elasticsearch.Existence
 {
     /// <summary>
     /// Term query finds objects which contain the exact given value.
