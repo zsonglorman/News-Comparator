@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ElasticsearchClient.Models.News;
+using Newtonsoft.Json;
 
 namespace ElasticsearchClient.Models.ElasticSearch.Result
 {

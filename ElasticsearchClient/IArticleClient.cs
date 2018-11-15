@@ -1,4 +1,4 @@
-﻿using ElasticsearchClient.Models;
+﻿using ElasticsearchClient.Models.News;
 using System.Threading.Tasks;
 
 namespace ElasticsearchClient

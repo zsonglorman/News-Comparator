@@ -1,7 +1,7 @@
-﻿using ElasticsearchClient.Models;
-using ElasticsearchClient.Models.Elasticsearch.Existence;
+﻿using ElasticsearchClient.Models.Elasticsearch.Existence;
 using ElasticsearchClient.Models.ElasticSearch.MoreLikeThis;
 using ElasticsearchClient.Models.ElasticSearch.Result;
+using ElasticsearchClient.Models.News;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

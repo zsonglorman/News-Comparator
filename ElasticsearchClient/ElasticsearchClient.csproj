@@ -49,8 +49,8 @@
   <ItemGroup>
     <Compile Include="ElasticsearchArticleClient.cs" />
     <Compile Include="IArticleClient.cs" />
-    <Compile Include="Models\Article.cs" />
-    <Compile Include="Models\ArticleExistsData.cs" />
+    <Compile Include="Models\News\Article.cs" />
+    <Compile Include="Models\News\ArticleExistsData.cs" />
     <Compile Include="Models\ElasticSearch\Existence\ConstantScore.cs" />
     <Compile Include="Models\ElasticSearch\Existence\ExistsQuery.cs" />
     <Compile Include="Models\ElasticSearch\Existence\Filter.cs" />
@@ -64,7 +64,7 @@
     <Compile Include="Models\ElasticSearch\Result\QueryResult.cs" />
     <Compile Include="Models\ElasticSearch\Result\Shards.cs" />
     <Compile Include="Models\ElasticSearch\Existence\Term.cs" />
-    <Compile Include="Models\RelatedArticleData.cs" />
+    <Compile Include="Models\News\RelatedArticleData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

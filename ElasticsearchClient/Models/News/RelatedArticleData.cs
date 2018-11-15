@@ -1,4 +1,4 @@
-﻿namespace ElasticsearchClient.Models
+﻿namespace ElasticsearchClient.Models.News
 {
     /// <summary>
     /// Represents the response object of a related article (More Like This) query.

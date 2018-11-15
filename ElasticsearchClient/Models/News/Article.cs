@@ -1,4 +1,4 @@
-﻿namespace ElasticsearchClient.Models
+﻿namespace ElasticsearchClient.Models.News
 {
     /// <summary>
     /// Represents a simple news article of an online newspaper.

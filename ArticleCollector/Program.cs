@@ -1,5 +1,5 @@
 ﻿using ElasticsearchClient;
-using ElasticsearchClient.Models;
+using ElasticsearchClient.Models.News;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

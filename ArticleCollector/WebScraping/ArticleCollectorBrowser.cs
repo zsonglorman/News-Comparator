@@ -1,4 +1,4 @@
-﻿using ElasticsearchClient.Models;
+﻿using ElasticsearchClient.Models.News;
 using HtmlAgilityPack;
 using ScrapySharp.Extensions;
 using ScrapySharp.Network;
