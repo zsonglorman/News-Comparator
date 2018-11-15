@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using ElasticsearchClient;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace RelatedArticlesService.Controllers
@@ -37,28 +39,37 @@ namespace RelatedArticlesService.Controllers
                 return BadRequest("Article address must not be empty.");
             }
 
-            // check whether article already exists in Elasticsearch
-            var articleAlreadyExistsData = await elasticsearchClient.TryGetArticleId(address);
-
-            if (!articleAlreadyExistsData.ArticleExists)
+            try
             {
-                // article doesn't exist in Elasticsearch yet, so return 404 Not Found
-                return NotFound("Article doesn't exist in Elasticsearch yet.");
+                // check whether article already exists in Elasticsearch
+                var articleAlreadyExistsData = await elasticsearchClient.TryGetArticleId(address);
+
+                if (!articleAlreadyExistsData.ArticleExists)
+                {
+                    // article doesn't exist in Elasticsearch yet, so return 404 Not Found
+                    return NotFound("Article doesn't exist in Elasticsearch yet.");
+                }
+
+                // article already exists, get its ID from client response
+                string articleId = articleAlreadyExistsData.ArticleId;
+
+                // get related article from Elasticsearch
+                var relatedArticleData = await elasticsearchClient.TryGetRelatedArticleAddress(articleId);
+                if (!relatedArticleData.RelatedArticleExists)
+                {
+                    // there is no related article found, so return 404 Not Found
+                    return NotFound("There is no related article in Elasticsearch.");
+                }
+
+                // related article successfully found, return its address
+                return Ok(relatedArticleData.RelatedArticleAddress);
             }
-
-            // article already exists, get its ID from client response
-            string articleId = articleAlreadyExistsData.ArticleId;
-
-            // get related article from Elasticsearch
-            var relatedArticleData = await elasticsearchClient.TryGetRelatedArticleAddress(articleId);
-            if (!relatedArticleData.RelatedArticleExists)
+            catch (Exception ex)
             {
-                // there is no related article found, so return 404 Not Found
-                return NotFound("There is no related article in Elasticsearch.");
+                // TODO log error internally
+                // return 500 Internal Server Error without exposing details of the error
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error happened while processing the request.");
             }
-
-            // related article successfully found, return its address
-            return Ok(relatedArticleData.RelatedArticleAddress);
         }
     }
 }

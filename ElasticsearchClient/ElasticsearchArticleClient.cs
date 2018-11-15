@@ -90,6 +90,7 @@ namespace ElasticsearchClient
                 if (existsQueryResult == null || existsQueryResult.Hits == null
                     || existsQueryResult.Hits.HitList == null)
                 {
+                    // TODO log unexpected JSON
                     throw new ApplicationException("Couldn't get result of Elasticsearch exists query: unexpected response JSON!");
                 }
 
@@ -108,7 +109,7 @@ namespace ElasticsearchClient
             else
             {
                 // Elasticsearch query was unsuccessful
-                // TODO log error
+                // TODO log error from response content
                 throw new ApplicationException("Elasticsearch exists query was unsuccessful: " + response.StatusCode.ToString());
             }
         }
@@ -195,7 +196,7 @@ namespace ElasticsearchClient
             else
             {
                 // Elasticsearch query was unsuccessful
-                // TODO log error
+                // TODO log error from response content
                 throw new ApplicationException("Elasticsearch more like this query was unsuccessful: " + response.StatusCode.ToString());
             }
         }
