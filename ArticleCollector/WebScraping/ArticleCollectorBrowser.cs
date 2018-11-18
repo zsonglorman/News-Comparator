@@ -121,7 +121,7 @@ namespace ArticleCollector.WebScraping
                     // this is a Live page, which is not a traditional news article, so we skip it
                     continue;
                 }
-                
+
                 var articleTextBuilder = new StringBuilder();
 
                 var lead = articlePage.Html.CssSelect(".lead");
