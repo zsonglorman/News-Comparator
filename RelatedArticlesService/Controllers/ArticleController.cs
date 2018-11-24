@@ -10,7 +10,7 @@ namespace RelatedArticlesService.Controllers
     /// The main web API controller for news articles.
     /// </summary>
     [Route("api/[controller]")] // specify route to API controller
-    public class ArticleController : Controller
+    public class ArticleController : ControllerBase
     {
         /// <summary>
         /// The Elasticsearch client used internally for finding related articles.
@@ -31,7 +31,8 @@ namespace RelatedArticlesService.Controllers
         /// </summary>
         /// <param name="address">the address to find related articles to, retrieved from URL query string</param>
         /// <returns>the address of the found related article (if any)</returns>
-        public async Task<IActionResult> Get([FromQuery] string address)
+        [HttpGet]
+        public async Task<IActionResult> GetRelatedArticleAsync([FromQuery] string address)
         {
             // validate the address retrieved from URL query string
             if (string.IsNullOrWhiteSpace(address))
