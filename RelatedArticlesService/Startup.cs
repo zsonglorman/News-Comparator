@@ -23,6 +23,9 @@ namespace RelatedArticlesService
             // TODO read uri from config
             services.AddSingleton<IArticleClient>(new ElasticsearchArticleClient(new Uri("http://localhost:9200/")));
 
+            // use mock article client for testing purposes (stores articles in memory instead of Elasticsearch) 
+            //services.AddSingleton<IArticleClient>(new MockArticleClient());
+
             services.AddMvc();
         }
 
