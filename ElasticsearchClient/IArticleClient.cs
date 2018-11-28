@@ -19,7 +19,8 @@ namespace ElasticsearchClient
         Task<ArticleExistsData> TryGetArticleId(string articleAddress);
 
         /// <summary>
-        /// Retrieves the address of a related article to the given article ID from the backend database.
+        /// Retrieves the address of a related article to the given article ID,
+        /// provided that a related article exists in the backend database.
         /// </summary>
         Task<RelatedArticleData> TryGetRelatedArticleAddress(string articleId);
     }

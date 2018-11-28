@@ -13,17 +13,17 @@ namespace RelatedArticlesService.Controllers
     public class ArticleController : ControllerBase
     {
         /// <summary>
-        /// The Elasticsearch client used internally for finding related articles.
+        /// The article client used internally for finding related articles.
         /// </summary>
-        private readonly IArticleClient elasticsearchClient;
+        private readonly IArticleClient articleClient;
 
         /// <summary>
-        /// Initializes a new controller with the given IArticleClient.
+        /// Initializes a new article controller with the given IArticleClient implementation.
         /// </summary>
         public ArticleController(IArticleClient client)
         {
-            // use dependency injection to set the client
-            elasticsearchClient = client;
+            // use dependency injection to set the client implementation
+            articleClient = client;
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace RelatedArticlesService.Controllers
             try
             {
                 // check whether article already exists in Elasticsearch
-                var articleAlreadyExistsData = await elasticsearchClient.TryGetArticleId(address);
+                var articleAlreadyExistsData = await articleClient.TryGetArticleId(address);
 
                 if (!articleAlreadyExistsData.ArticleExists)
                 {
@@ -54,15 +54,15 @@ namespace RelatedArticlesService.Controllers
                 // article already exists, get its ID from client response
                 string articleId = articleAlreadyExistsData.ArticleId;
 
-                // get related article from Elasticsearch
-                var relatedArticleData = await elasticsearchClient.TryGetRelatedArticleAddress(articleId);
+                // get related article from Elasticsearch based on article ID
+                var relatedArticleData = await articleClient.TryGetRelatedArticleAddress(articleId);
                 if (!relatedArticleData.RelatedArticleExists)
                 {
                     // there is no related article found, so return 404 Not Found
                     return NotFound("There is no related article in Elasticsearch.");
                 }
 
-                // related article successfully found, return its address
+                // related article successfully found, return its address in the 200 OK response
                 return Ok(relatedArticleData.RelatedArticleAddress);
             }
             catch (Exception ex)

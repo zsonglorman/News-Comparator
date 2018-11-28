@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace ElasticsearchClient.Models.ElasticSearch.Result
+namespace ElasticsearchClient.Models.Elasticsearch.Result
 {
     public class Hits
     {

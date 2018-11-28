@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ElasticsearchClient.Models.ElasticSearch.Result
+namespace ElasticsearchClient.Models.Elasticsearch.Result
 {
     public class Shards
     {

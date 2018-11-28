@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ElasticsearchClient.Models.ElasticSearch.MoreLikeThis
+namespace ElasticsearchClient.Models.Elasticsearch.MoreLikeThis
 {
     class MoreLikeThis
     {

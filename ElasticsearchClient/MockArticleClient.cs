@@ -7,6 +7,7 @@ namespace ElasticsearchClient
 {
     /// <summary>
     /// Represents a mock implementation of a client managing the articles.
+    /// The articles are stored simply in memory.
     /// </summary>
     public class MockArticleClient : IArticleClient
     {

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Comment CommentText="Interface which defines methods for managing the articles between the client and the backend.">
+    <Position X="5.246" Y="1.06" Height="0.451" Width="2.929" />
+  </Comment>
+  <Interface Name="ElasticsearchClient.IArticleClient">
+    <Position X="4" Y="1" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>IArticleClient.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

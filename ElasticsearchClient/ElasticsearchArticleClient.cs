@@ -1,6 +1,6 @@
 ﻿using ElasticsearchClient.Models.Elasticsearch.Existence;
-using ElasticsearchClient.Models.ElasticSearch.MoreLikeThis;
-using ElasticsearchClient.Models.ElasticSearch.Result;
+using ElasticsearchClient.Models.Elasticsearch.MoreLikeThis;
+using ElasticsearchClient.Models.Elasticsearch.Result;
 using ElasticsearchClient.Models.News;
 using Newtonsoft.Json;
 using System;
@@ -174,14 +174,13 @@ namespace ElasticsearchClient
                 }
 
                 string relatedArticleAddress = "";
-                if (moreLikeThisResult.Hits.Total == 0
-                    || moreLikeThisResult.Hits.HitList.Count == 0)
+                if (moreLikeThisResult.Hits.HitList.Count == 0)
                 {
                     // there is no related article at all
                     return new RelatedArticleData(false, relatedArticleAddress);
                 }
 
-                // get most related article
+                // get most related article from hits list
                 var mostRelatedArticleResult = moreLikeThisResult.Hits.HitList[0];
                 if (mostRelatedArticleResult.Score < 10)
                 {
@@ -190,8 +189,7 @@ namespace ElasticsearchClient
                 }
 
                 // return the most related article's address
-                relatedArticleAddress = mostRelatedArticleResult.Article.Address;
-                return new RelatedArticleData(true, relatedArticleAddress);
+                return new RelatedArticleData(true, mostRelatedArticleResult.Article.Address);
             }
             else
             {
@@ -210,7 +208,7 @@ namespace ElasticsearchClient
         {
             var elasticMoreLikeThisQuery = new MoreLikeThisQuery()
             {
-                Query = new Models.ElasticSearch.MoreLikeThis.Query()
+                Query = new Models.Elasticsearch.MoreLikeThis.Query()
                 {
                     MoreLikeThis = new MoreLikeThis()
                     {
