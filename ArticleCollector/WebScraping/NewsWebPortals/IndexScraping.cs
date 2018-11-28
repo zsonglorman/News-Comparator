@@ -9,6 +9,9 @@ using System.Text;
 
 namespace ArticleCollector.WebScraping.NewsWebPortals
 {
+    /// <summary>
+    /// Web scraping class used for retrieving articles from Index.hu.
+    /// </summary>
     class IndexScraping : ScrapingBase
     {
         /// <summary>
@@ -16,6 +19,9 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
         /// </summary>
         private readonly Uri indexUrl;
 
+        /// <summary>
+        /// Initializes a new web scraping object for Index.hu with the given browser.
+        /// </summary>
         public IndexScraping(ScrapingBrowser scrapingBrowser)
             : base(scrapingBrowser)
         {
@@ -28,6 +34,8 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
         /// <returns>list of articles from Index.hu</returns>
         public override List<Article> GetArticles()
         {
+            scrapingBrowser.Encoding = Encoding.UTF8;
+
             var indexPage = scrapingBrowser.NavigateToPage(indexUrl);
 
             var articleNodes = indexPage.Html.CssSelect(".rovatajanlo");

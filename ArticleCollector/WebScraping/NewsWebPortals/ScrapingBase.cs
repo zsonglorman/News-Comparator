@@ -15,7 +15,7 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
         protected ScrapingBrowser scrapingBrowser;
 
         /// <summary>
-        /// Initializes a news scraping object with the given browser.
+        /// Initializes a new web scraping object with the given browser.
         /// </summary>
         public ScrapingBase(ScrapingBrowser scrapingBrowser)
         {

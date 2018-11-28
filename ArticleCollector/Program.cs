@@ -1,8 +1,4 @@
-﻿using ElasticsearchClient;
-using ElasticsearchClient.Models.News;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace ArticleCollector
 {
@@ -17,56 +13,13 @@ namespace ArticleCollector
             {
                 // TODO read settings from config file
 
-                // wait for async main method
-                MainAsync().GetAwaiter().GetResult();
+                // initialize article collector web scraping browser, then get new articles and save them in Elasticsearch
+                var articleCollectorBrowser = new WebScraping.ArticleCollectorBrowser();
+                articleCollectorBrowser.SaveNewArticlesInElasticsearch().Wait();
             }
             catch (Exception ex)
             {
                 // TODO log error with complete stacktrace
-            }
-        }
-
-        /// <summary>
-        /// Main async method of application.
-        /// </summary>
-        static async Task MainAsync()
-        {
-            List<Article> articles;
-            try
-            {
-                // initialize article collector web scraping browser, and get articles from news portals
-                var articleCollectorBrowser = new WebScraping.ArticleCollectorBrowser();
-                articles = articleCollectorBrowser.GetArticlesFromNewsPortals();
-            }
-            catch (Exception ex)
-            {
-                throw new ApplicationException("Error happened while getting articles from news portals.", ex);
-            }
-
-            // initialize Elasticsearch API client (TODO read URI from config)
-            var client = new ElasticsearchArticleClient(new Uri("http://localhost:9200/"));
-
-            foreach (var article in articles)
-            {
-                try
-                {
-                    // check whether article already exists in Elasticsearch
-                    var articleAlreadyExistsData = await client.TryGetArticleId(article.Address);
-
-                    if (!articleAlreadyExistsData.ArticleExists)
-                    {
-                        // article doesn't exist in Elasticsearch yet, so let's add it
-                        await client.AddArticleAsync(article);
-                    }
-                    else
-                    {
-                        // article already exists in Elasticsearch, so we skip this article
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // TODO log error
-                }
             }
         }
     }

@@ -9,6 +9,9 @@ using System.Text;
 
 namespace ArticleCollector.WebScraping.NewsWebPortals
 {
+    /// <summary>
+    /// Web scraping class used for retrieving articles from Hirado.hu.
+    /// </summary>
     class HiradoScraping : ScrapingBase
     {
         /// <summary>
@@ -16,6 +19,9 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
         /// </summary>
         private readonly Uri hiradoUrl;
 
+        /// <summary>
+        /// Initializes a new web scraping object for Hirado.hu with the given browser.
+        /// </summary>
         public HiradoScraping(ScrapingBrowser scrapingBrowser)
             : base(scrapingBrowser)
         {
@@ -29,6 +35,8 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
         /// <returns>list of articles from Hirado.hu</returns>
         public override List<Article> GetArticles()
         {
+            scrapingBrowser.Encoding = Encoding.UTF8;
+
             var hiradoPage = scrapingBrowser.NavigateToPage(hiradoUrl);
 
             var articleNodes = hiradoPage.Html.CssSelect(".listerTxt");
@@ -38,7 +46,7 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
             {
                 // get address from href attribute of anchor HTML tag
                 string address = articleNode.CssSelect("a").First().GetAttributeValue("href", "");
-                address = address.Replace("//www.hirado.hu", "https://www.hirado.hu");
+                address = address.Replace("//www.hirado.hu", "https://www.hirado.hu") + "/";
 
                 string title = articleNode.CssSelect("h4").First().InnerText.Trim();
                 string shortLead = articleNode.CssSelect("div.Txt").First().InnerText.Trim();

@@ -9,6 +9,9 @@ using System.Text;
 
 namespace ArticleCollector.WebScraping.NewsWebPortals
 {
+    /// <summary>
+    /// Web scraping class used for retrieving articles from Origo.hu.
+    /// </summary>
     class OrigoScraping : ScrapingBase
     {
         /// <summary>
@@ -16,6 +19,9 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
         /// </summary>
         private readonly Uri origoUrl;
 
+        /// <summary>
+        /// Initializes a new web scraping object for Origo.hu with the given browser.
+        /// </summary>
         public OrigoScraping(ScrapingBrowser scrapingBrowser)
             : base(scrapingBrowser)
         {
@@ -28,6 +34,10 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
         /// <returns>list of articles from Origo.hu</returns>
         public override List<Article> GetArticles()
         {
+            // Origo requires this specific encoding, otherwise Hungarian characters will not be recognized
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            scrapingBrowser.Encoding = Encoding.GetEncoding("ISO-8859-2");
+
             var origoPage = scrapingBrowser.NavigateToPage(origoUrl);
 
             var articleNodes = origoPage.Html.CssSelect(".news-item");
