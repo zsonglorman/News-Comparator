@@ -4,13 +4,12 @@ using ElasticsearchClient.Models.News;
 using ScrapySharp.Network;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ArticleCollector.WebScraping
 {
     /// <summary>
-    /// Web scraping browser used for collecting news articles.
+    /// Web scraping browser used for collecting and saving news articles.
     /// </summary>
     class ArticleCollectorBrowser
     {
@@ -20,12 +19,12 @@ namespace ArticleCollector.WebScraping
         private ScrapingBrowser scrapingBrowser;
 
         /// <summary>
-        /// List of web scraping classes for different news portals
+        /// List of web scraping classes for different news portals (heterogenous collection).
         /// </summary>
         private List<ScrapingBase> scrapingTools;
 
         /// <summary>
-        /// Initializes a new web scraping browser for collecting articles.
+        /// Initializes a new web scraping browser for collecting and saving news articles.
         /// </summary>
         public ArticleCollectorBrowser()
         {
@@ -46,7 +45,7 @@ namespace ArticleCollector.WebScraping
         }
 
         /// <summary>
-        /// Collects articles from different news portals, and saves the news ones in Elasticsearch.
+        /// Collects articles from different news portals, and saves the new ones in Elasticsearch.
         /// </summary>
         public async Task SaveNewArticlesInElasticsearch()
         {

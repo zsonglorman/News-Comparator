@@ -19,9 +19,9 @@ namespace RelatedArticlesService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // use dependency injection to inject article client for Elasticsearch API with given base address
-            // TODO read uri from config
-            services.AddSingleton<IArticleClient>(new ElasticsearchArticleClient(new Uri("http://localhost:9200/")));
+            // use dependency injection to inject article client for Elasticsearch API
+            var baseAddress = new Uri("http://localhost:9200/"); // TODO read uri from config
+            services.AddSingleton<IArticleClient>(new ElasticsearchArticleClient(baseAddress));
 
             // use mock article client for testing purposes (stores articles in memory instead of Elasticsearch) 
             //services.AddSingleton<IArticleClient>(new MockArticleClient());
