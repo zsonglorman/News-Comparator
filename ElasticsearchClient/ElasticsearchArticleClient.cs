@@ -3,6 +3,7 @@ using ElasticsearchClient.Models.Elasticsearch.MoreLikeThis;
 using ElasticsearchClient.Models.Elasticsearch.Result;
 using ElasticsearchClient.Models.News;
 using Newtonsoft.Json;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -16,6 +17,11 @@ namespace ElasticsearchClient
     /// </summary>
     public class ElasticsearchArticleClient : IArticleClient
     {
+        /// <summary>
+        /// NLog log manager.
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The base address of Elasticsearch API.
         /// </summary>
@@ -44,6 +50,8 @@ namespace ElasticsearchClient
             // set client default Accept header to application/json
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            Logger.Info("Elasticsearch Article Client successfully initialized with base address {0}", baseAddress.AbsoluteUri);
         }
 
         /// <summary>
@@ -52,16 +60,19 @@ namespace ElasticsearchClient
         /// <param name="article">the Article to send</param>
         public async Task AddArticleAsync(Article article)
         {
+            Logger.Info("Saving article in Elasticsearch started: {0}", article.Address);
+
             var response = await client.PostAsJsonAsync("/news/_doc?pretty", article);
             if (response.StatusCode == System.Net.HttpStatusCode.Created)
             {
-                // article successfully added
+                Logger.Info("Article successfully saved in Elasticsearch.");
             }
             else
             {
-                // article couldn't be added
+                // Elasticsearch API returned an error
                 string responseContent = await response.Content.ReadAsStringAsync();
-                // TODO log error
+                Logger.Error("Article couldn't be saved in Elasticsearch: {0} - {1}", response.StatusCode.ToString(), responseContent);
+
                 throw new ApplicationException("Article couldn't be added to Elasticsearch: " + response.StatusCode.ToString());
             }
         }
@@ -73,6 +84,8 @@ namespace ElasticsearchClient
         /// <returns>returns true if the given article exists together with its ID</returns>
         public async Task<ArticleExistsData> TryGetArticleId(string articleAddress)
         {
+            Logger.Info("Getting article ID started: {0}", articleAddress);
+
             // generate Elasticsearch exists query with the article's address
             var elasticExistsQuery = GetElasticExistsQuery(articleAddress);
 
@@ -84,13 +97,15 @@ namespace ElasticsearchClient
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
+                Logger.Info("Elasticsearch exists query was successful.");
+
                 // Elasticsearch query was successful, deserialize result
                 var existsQueryResult = JsonConvert.DeserializeObject<QueryResult>(responseContent);
 
                 if (existsQueryResult == null || existsQueryResult.Hits == null
                     || existsQueryResult.Hits.HitList == null)
                 {
-                    // TODO log unexpected JSON
+                    Logger.Error("Elasticsearch returned unexpected JSON: {0}", responseContent);
                     throw new ApplicationException("Couldn't get result of Elasticsearch exists query: unexpected response JSON!");
                 }
 
@@ -104,12 +119,13 @@ namespace ElasticsearchClient
                     articleId = existsQueryResult.Hits.HitList[0].Id;
                 }
 
+                Logger.Info("Article exists: {0}, with ID: {1}", articleExists, articleId);
                 return new ArticleExistsData(articleExists, articleId);
             }
             else
             {
                 // Elasticsearch query was unsuccessful
-                // TODO log error from response content
+                Logger.Error("Elasticsearch exists query was unsuccessful: {0} - {1}", response.StatusCode.ToString(), responseContent);
                 throw new ApplicationException("Elasticsearch exists query was unsuccessful: " + response.StatusCode.ToString());
             }
         }
@@ -153,6 +169,8 @@ namespace ElasticsearchClient
         /// <returns>returns true if the related article exists together with its address</returns>
         public async Task<RelatedArticleData> TryGetRelatedArticleAddress(string articleId)
         {
+            Logger.Info("Getting related article's address started for article ID: {0}", articleId);
+
             // generate Elasticsearch more like this query with the article's id
             var elasticMoreLikeThisQuery = GetElasticMoreLikeThisQuery(articleId);
 
@@ -164,12 +182,15 @@ namespace ElasticsearchClient
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
+                Logger.Info("Elasticsearch More Like This query was successful.");
+
                 // Elasticsearch query was successful, deserialize result
                 var moreLikeThisResult = JsonConvert.DeserializeObject<QueryResult>(responseContent);
 
                 if (moreLikeThisResult == null || moreLikeThisResult.Hits == null
                     || moreLikeThisResult.Hits.HitList == null)
                 {
+                    Logger.Error("Elasticsearch returned unexpected JSON: {0}", responseContent);
                     throw new ApplicationException("Couldn't get result of Elasticsearch more like this query: unexpected response JSON!");
                 }
 
@@ -177,6 +198,7 @@ namespace ElasticsearchClient
                 if (moreLikeThisResult.Hits.HitList.Count == 0)
                 {
                     // there is no related article at all
+                    Logger.Info("There is related article found at all.");
                     return new RelatedArticleData(false, relatedArticleAddress);
                 }
 
@@ -185,17 +207,20 @@ namespace ElasticsearchClient
                 if (mostRelatedArticleResult.Score < 10)
                 {
                     // based on the result score, there is no related article
+                    Logger.Info("There is no related article found based on Elasticsearch score.");
                     return new RelatedArticleData(false, relatedArticleAddress);
                 }
 
                 // return the most related article's address
+                Logger.Info("Related article found: {0}", mostRelatedArticleResult.Article.Address);
                 return new RelatedArticleData(true, mostRelatedArticleResult.Article.Address);
             }
             else
             {
                 // Elasticsearch query was unsuccessful
-                // TODO log error from response content
-                throw new ApplicationException("Elasticsearch more like this query was unsuccessful: " + response.StatusCode.ToString());
+                Logger.Error("Elasticsearch More Like This query was unsuccessful: {0} - {1}",
+                    response.StatusCode.ToString(), responseContent);
+                throw new ApplicationException("Elasticsearch More Like This query was unsuccessful: " + response.StatusCode.ToString());
             }
         }
 

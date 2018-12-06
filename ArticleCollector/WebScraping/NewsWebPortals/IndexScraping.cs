@@ -1,5 +1,6 @@
 ﻿using ElasticsearchClient.Models.News;
 using HtmlAgilityPack;
+using NLog;
 using ScrapySharp.Extensions;
 using ScrapySharp.Network;
 using System;
@@ -14,6 +15,11 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
     /// </summary>
     class IndexScraping : ScrapingBase
     {
+        /// <summary>
+        /// NLog log manager.
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// URL of Index.hu news web portal.
         /// </summary>
@@ -34,6 +40,8 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
         /// <returns>list of articles from Index.hu</returns>
         public override List<Article> GetArticles()
         {
+            Logger.Info("Getting articles from Index.hu via web scraping started.");
+
             scrapingBrowser.Encoding = Encoding.UTF8;
 
             var indexPage = scrapingBrowser.NavigateToPage(indexUrl);
@@ -78,7 +86,7 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
                 if (articlePage.Html.InnerHtml.Contains("<div class=\"allapot elo\">Élő</div>")
                     || articlePage.Html.InnerHtml.Contains("<div class=\"allapot vege\">Vége</div>"))
                 {
-                    // TODO this is a Live page, which is not a traditional news article, so we skip it
+                    // this is a Live page, which is not a traditional news article, so we skip it
                     continue;
                 }
 
@@ -96,7 +104,15 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
                 // get donation node ("nincs masik" widget)
                 var donateNode = articleText.Descendants().Where(d => d.GetAttributeValue("class", "").Contains("nm_widget")).FirstOrDefault();
 
-                foreach (var p in articleText.Descendants())
+                var paragraphs = articleText.Descendants();
+
+                if (paragraphs == null)
+                {
+                    Logger.Error("Article text paragraphs not found for {0}", article.Address);
+                    continue;
+                }
+
+                foreach (var p in paragraphs)
                 {
                     if (p.OriginalName == "p" || p.OriginalName.StartsWith("h") || p.OriginalName == "li")
                     {
@@ -116,6 +132,7 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
                 article.Text = articleTextBuilder.ToString();
             }
 
+            Logger.Info("{0} articles successfully retrieved from Index.hu.", articles.Count);
             return articles;
         }
     }

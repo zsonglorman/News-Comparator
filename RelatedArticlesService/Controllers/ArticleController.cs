@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ElasticsearchClient;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NLog;
 
 namespace RelatedArticlesService.Controllers
 {   
@@ -12,6 +13,11 @@ namespace RelatedArticlesService.Controllers
     [Route("api/[controller]")] // specify route to API controller
     public class ArticleController : ControllerBase
     {
+        /// <summary>
+        /// NLog log manager.
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The article client used internally for finding related articles.
         /// </summary>
@@ -24,6 +30,8 @@ namespace RelatedArticlesService.Controllers
         {
             // use dependency injection to set the client implementation
             articleClient = client;
+
+            Logger.Info("Article Controller successfully initialized with a client of type {0}.", client.GetType().Name);
         }
 
         /// <summary>
@@ -34,9 +42,12 @@ namespace RelatedArticlesService.Controllers
         [HttpGet]
         public async Task<IActionResult> GetRelatedArticleAsync([FromQuery] string address)
         {
+            Logger.Info("Incoming GET request for related article method with address '{0}'", address ?? "");
+
             // validate the address retrieved from URL query string
             if (string.IsNullOrWhiteSpace(address))
             {
+                Logger.Info("Address retrieved from URL query string is null or empty, so 400 Bad Request will be returned.");
                 return BadRequest("Article address must not be empty.");
             }
 
@@ -48,6 +59,7 @@ namespace RelatedArticlesService.Controllers
                 if (!articleAlreadyExistsData.ArticleExists)
                 {
                     // article doesn't exist in Elasticsearch yet, so return 404 Not Found
+                    Logger.Info("Article doesn't exist in Elasticsearch yet, so 404 Not Found will be returned.");
                     return NotFound("Article doesn't exist in Elasticsearch yet.");
                 }
 
@@ -59,15 +71,18 @@ namespace RelatedArticlesService.Controllers
                 if (!relatedArticleData.RelatedArticleExists)
                 {
                     // there is no related article found, so return 404 Not Found
+                    Logger.Info("There is no related article found in Elasticsearch, so 404 Not Found will be returned.");
                     return NotFound("There is no related article in Elasticsearch.");
                 }
 
                 // related article successfully found, return its address in the 200 OK response
+                Logger.Info("Related article successfully found, so 200 OK will be returned with related article's address.");
                 return Ok(relatedArticleData.RelatedArticleAddress);
             }
             catch (Exception ex)
             {
-                // TODO log error internally
+                Logger.Error(ex, "Error happened while processing incoming request:");
+                
                 // return 500 Internal Server Error without exposing details of the error
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error happened while processing the request.");
             }

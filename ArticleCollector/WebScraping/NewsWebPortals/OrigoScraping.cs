@@ -1,4 +1,5 @@
 ﻿using ElasticsearchClient.Models.News;
+using NLog;
 using ScrapySharp.Extensions;
 using ScrapySharp.Network;
 using System;
@@ -14,6 +15,11 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
     /// </summary>
     class OrigoScraping : ScrapingBase
     {
+        /// <summary>
+        /// NLog log manager.
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// URL of Origo.hu news web portal.
         /// </summary>
@@ -34,6 +40,8 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
         /// <returns>list of articles from Origo.hu</returns>
         public override List<Article> GetArticles()
         {
+            Logger.Info("Getting articles from Origo.hu via web scraping started.");
+
             // Origo requires this specific encoding, otherwise Hungarian characters will not be recognized
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             scrapingBrowser.Encoding = Encoding.GetEncoding("ISO-8859-2");
@@ -70,6 +78,12 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
                 var articleTextNode = articlePage.Html.CssSelect("#article-text").First();
                 var paragraphs = articleTextNode.Descendants("p");
 
+                if (paragraphs == null)
+                {
+                    Logger.Error("Article text paragraphs not found for {0}", article.Address);
+                    continue;
+                }
+
                 foreach (var p in paragraphs)
                 {
                     // paragraphs, headers and lists
@@ -84,6 +98,7 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
                 article.Text = articleTextBuilder.ToString();
             }
 
+            Logger.Info("{0} articles successfully retrieved from Origo.hu.", articles.Count);
             return articles;
         }
     }

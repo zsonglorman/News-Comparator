@@ -1,4 +1,5 @@
 ﻿using ElasticsearchClient.Models.News;
+using NLog;
 using ScrapySharp.Extensions;
 using ScrapySharp.Network;
 using System;
@@ -15,6 +16,11 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
     class HiradoScraping : ScrapingBase
     {
         /// <summary>
+        /// NLog log manager.
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
         /// URL of Hirado.hu news web portal.
         /// </summary>
         private readonly Uri hiradoUrl;
@@ -28,13 +34,14 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
             hiradoUrl = new Uri("https://www.hirado.hu/belfold/");
         }
 
-
         /// <summary>
         /// Retrieves articles from Hirado.hu by web scraping.
         /// </summary>
         /// <returns>list of articles from Hirado.hu</returns>
         public override List<Article> GetArticles()
         {
+            Logger.Info("Getting articles from Hirado.hu via web scraping started.");
+
             scrapingBrowser.Encoding = Encoding.UTF8;
 
             var hiradoPage = scrapingBrowser.NavigateToPage(hiradoUrl);
@@ -67,6 +74,12 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
                 var articleTextNode = articlePage.Html.CssSelect(".articleContent").First();
                 var paragraphs = articleTextNode.Descendants("p");
 
+                if (paragraphs == null)
+                {
+                    Logger.Error("Article text paragraphs not found for {0}", article.Address);
+                    continue;
+                }
+
                 foreach (var p in paragraphs)
                 {
                     if (p.OriginalName == "p" || p.OriginalName == "li")
@@ -80,6 +93,7 @@ namespace ArticleCollector.WebScraping.NewsWebPortals
                 article.Text = articleTextBuilder.ToString();
             }
 
+            Logger.Info("{0} articles successfully retrieved from Hirado.hu.", articles.Count);
             return articles;
         }
     }

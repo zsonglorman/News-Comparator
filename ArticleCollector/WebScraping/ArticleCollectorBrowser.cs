@@ -1,6 +1,7 @@
 ﻿using ArticleCollector.WebScraping.NewsWebPortals;
 using ElasticsearchClient;
 using ElasticsearchClient.Models.News;
+using NLog;
 using ScrapySharp.Network;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,11 @@ namespace ArticleCollector.WebScraping
     /// </summary>
     class ArticleCollectorBrowser
     {
+        /// <summary>
+        /// NLog log manager.
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The browser by ScrapySharp used internally for web scraping.
         /// </summary>
@@ -42,6 +48,8 @@ namespace ArticleCollector.WebScraping
                 new HiradoScraping(scrapingBrowser),
                 new OrigoScraping(scrapingBrowser),
             };
+
+            Logger.Info("Article Collector Browser successfully initialized with {0} scraping tools.", scrapingTools.Count);
         }
 
         /// <summary>
@@ -71,17 +79,17 @@ namespace ArticleCollector.WebScraping
 
                     if (!articleAlreadyExistsData.ArticleExists)
                     {
-                        // article doesn't exist in Elasticsearch yet, so let's add it
+                        Logger.Info("This article doesn't exist in Elasticsearch yet, let's save it.");
                         await client.AddArticleAsync(article);
                     }
                     else
                     {
-                        // article already exists in Elasticsearch, so we skip this article
+                        Logger.Info("This article already exists in Elasticsearch, so we skip it: {0}", article.Address);
                     }
                 }
                 catch (Exception ex)
                 {
-                    // TODO log error
+                    Logger.Error(ex, "Error happened while handling article {0}:", article.Address);
                 }
             }
         }
@@ -92,6 +100,7 @@ namespace ArticleCollector.WebScraping
         /// <returns>list of all articles retrieved</returns>
         private List<Article> GetArticlesFromNewsPortals()
         {
+            Logger.Info("Getting articles from news portals via web scraping started.");
             var allArticles = new List<Article>();
 
             // get articles from different news portals
@@ -102,6 +111,7 @@ namespace ArticleCollector.WebScraping
                 allArticles.AddRange(articles);
             }
 
+            Logger.Info("Successfully retrieved altogether {0} articles from news portals.", allArticles.Count);
             return allArticles;
         }
     }
