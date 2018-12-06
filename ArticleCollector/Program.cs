@@ -18,9 +18,7 @@ namespace ArticleCollector
             Logger.Info("Article Collector started.");
 
             try
-            {                
-                // TODO read settings from config file
-
+            {
                 // initialize article collector web scraping browser, then get new articles and save them in Elasticsearch
                 var articleCollectorBrowser = new WebScraping.ArticleCollectorBrowser();
                 articleCollectorBrowser.SaveNewArticlesInElasticsearch().Wait();

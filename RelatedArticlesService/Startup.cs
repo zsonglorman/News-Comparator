@@ -15,9 +15,19 @@ namespace RelatedArticlesService
         /// </summary>
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
+        private readonly string elasticsearchApiBaseAddress;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            // read Elasticsearch API base address from appsettings.json config
+            elasticsearchApiBaseAddress = configuration["ElasticsearchApiBaseAddress"];
+            if (string.IsNullOrEmpty(elasticsearchApiBaseAddress))
+            {
+                Logger.Error("ElasticsearchApiBaseAddress is not provided in configuration file. Default http://localhost:9200/ will be used.");
+                elasticsearchApiBaseAddress = "http://localhost:9200/";
+            }
         }
 
         public IConfiguration Configuration { get; }
@@ -28,7 +38,7 @@ namespace RelatedArticlesService
             Logger.Info("Related Articles Web API is starting up, services are being configured.");
 
             // use dependency injection to inject article client for Elasticsearch API
-            var baseAddress = new Uri("http://localhost:9200/"); // TODO read uri from config
+            var baseAddress = new Uri(elasticsearchApiBaseAddress);
             services.AddSingleton<IArticleClient>(new ElasticsearchArticleClient(baseAddress));
 
             // use mock article client for testing purposes (stores articles in memory instead of Elasticsearch) 

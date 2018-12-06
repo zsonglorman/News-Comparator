@@ -5,6 +5,7 @@ using NLog;
 using ScrapySharp.Network;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Threading.Tasks;
 
 namespace ArticleCollector.WebScraping
@@ -67,8 +68,14 @@ namespace ArticleCollector.WebScraping
                 throw new ApplicationException("Error happened while getting articles from news portals.", ex);
             }
 
-            // initialize Elasticsearch API client (TODO read URI from config)
-            var client = new ElasticsearchArticleClient(new Uri("http://localhost:9200/"));
+            // initialize Elasticsearch API client (read base address from config)
+            string elasticsearchApiBaseAddress = ConfigurationManager.AppSettings["ElasticsearchApiBaseAddress"];
+            if (string.IsNullOrEmpty(elasticsearchApiBaseAddress))
+            {
+                throw new ApplicationException("ElasticsearchApiBaseAddress is not provided in configuration file!");
+            }
+
+            var client = new ElasticsearchArticleClient(new Uri(elasticsearchApiBaseAddress));
 
             foreach (var article in articles)
             {
